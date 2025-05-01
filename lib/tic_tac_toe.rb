@@ -20,7 +20,7 @@ def input_to_index(user_input)
 end
 
 def move(index, token = 'x')
-board[index] = token
+board[index] = token.downcase
 end
 
 def position_taken?(index)
@@ -32,9 +32,7 @@ end
 end
 
 def valid_move?(index)
-if index.between?(0,8) && !position_taken?(index)
-  return true
-end
+ index.between?(0,8) && !position_taken?(index)
 end
 
 def turn_count
@@ -52,17 +50,23 @@ self.turn_count.even? ? "x" : "o"
 end
 
 def turn 
-puts "Player #{self.current_player} please enter 1-9"
-input = gets.chomp 
-self.turn unless (1..9).include?(input.to_i)
-position = self.input_to_index(input)
+  puts "Player #{self.current_player} please enter 1-9"
+  input = gets.chomp 
+  
+  unless (1..9).include?(input.to_i)
+    puts "Invalid input"
+    return self.turn
+  end
+  
+  position = self.input_to_index(input)
 
-if valid_move?(position)
-  move(position, self.current_player)
-  self.display_board
-else
-puts "Invalid move position already taken please select empty place"
-end
+  if valid_move?(position)
+    move(position, self.current_player)
+    self.display_board
+  else
+    puts "Invalid move position already taken please select empty place"
+    self.turn
+  end
 end
 
 def won?
@@ -82,8 +86,7 @@ false
 end
 
 def full?
-  unless board.include?("")
-  end 
+  !board.include?("")
 end
 
 def draw?
@@ -91,12 +94,12 @@ def draw?
 end
 
 def over?
-  self.won? || self.draw?
+  !!self.won? || self.draw?
 end
 
 def winner
-  if self.won?
-    (self.current_player == "x") ? "o" : "x"
+  if winning_combo = self.won?
+    board[winning_combo.first].downcase
   end
 end
 
